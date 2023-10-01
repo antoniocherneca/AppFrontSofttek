@@ -1,7 +1,9 @@
-﻿@{
+﻿@model AppFrontSofttek.Models.Login
+
+@{
     ViewData["Title"] = "Home Page";
 }
 
 <div class="text-center">
-    <h1 class="display-4">Bienvenido</h1>
+    <h1 class="display-4">Bienvenido @Html.DisplayFor(x => x.UserName)</h1>
 </div>
