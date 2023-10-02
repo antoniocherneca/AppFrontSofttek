@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
+
 namespace AppFrontSofttek
 {
     public class Program
@@ -12,6 +14,28 @@ namespace AppFrontSofttek
             builder.Services.AddHttpClient("useApi", config =>
             {
                 config.BaseAddress = new Uri(builder.Configuration["ServiceUrl:ApiUrl"]);
+            });
+
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            }).AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, config =>
+            {
+                config.Events.OnRedirectToLogin = context =>
+                {
+                    context.Response.Redirect("https://localhost:7199");
+                    return Task.CompletedTask;
+                };
+            });
+
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy("Admin", policy =>
+                {
+                    policy.RequireRole("1");
+                });
             });
 
             var app = builder.Build();
@@ -29,6 +53,7 @@ namespace AppFrontSofttek
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllerRoute(
